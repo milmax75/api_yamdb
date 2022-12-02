@@ -6,8 +6,7 @@ class Category (models.Model):
     name = models.CharField('название категории', max_length=256)
     slug = models.SlugField(
         max_length=50,
-        unique=True,
-        db_index=True
+        unique=True        
     )
 
     class Meta:       
@@ -22,8 +21,7 @@ class Genre(models.Model):
     name = models.CharField('название жанра', max_length=256)
     slug = models.SlugField(
         max_length=50,
-        unique=True,
-        db_index=True
+        unique=True        
     )
 
     class Meta:       
@@ -49,8 +47,7 @@ class Title(models.Model):
         related_name='titles',
         verbose_name='категория',
         help_text='выберете категорию',
-        null = True,
-        blank=True,
+        null = True        
     )    
     genre =  models.ManyToManyField(        
         Genre,        
@@ -58,9 +55,9 @@ class Title(models.Model):
         related_name='titles',
         verbose_name='жанр',
         help_text='выберете жанр',
-        null = True,
-        blank=True,
+        null = True        
     )
+   # rating = 
 
     class Meta:
         ordering = ('-year',)
