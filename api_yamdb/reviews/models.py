@@ -3,28 +3,36 @@ from .validators import validate_year
 
 
 class Category (models.Model):
-    name = models.CharField('название категории', max_length=256)
+    name = models.CharField(
+        'название категории',
+        max_length=256,
+        unique=True
+    )
     slug = models.SlugField(
         max_length=50,
-        unique=True        
+        unique=True
     )
 
-    class Meta:       
+    class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.name
-    
+
 
 class Genre(models.Model):
-    name = models.CharField('название жанра', max_length=256)
+    name = models.CharField(
+        'название жанра',
+        max_length=256,
+        unique=True
+    )
     slug = models.SlugField(
         max_length=50,
-        unique=True        
+        unique=True
     )
 
-    class Meta:       
+    class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
@@ -39,25 +47,28 @@ class Title(models.Model):
         max_length=4,
         validators=[validate_year]
     )
-    # добавить ограничение
     description = models.TextField('описание', blank=True)
-    category = models.ForeignKey(        
-        Category,        
-        on_delete=models.SET_NULL,        
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
         related_name='titles',
         verbose_name='категория',
         help_text='выберете категорию',
-        null = True        
-    )    
-    genre =  models.ManyToManyField(        
-        Genre,        
+        null=True
+    )
+    genre = models.ManyToManyField(
+        Genre,
         on_delete=models.SET_NULL,
         related_name='titles',
         verbose_name='жанр',
         help_text='выберете жанр',
-        null = True        
+        null=True
     )
-   # rating = 
+    rating = models.IntegerField(
+        verbose_name='рейтинг',
+        null=True,
+        default=None
+    )
 
     class Meta:
         ordering = ('-year',)
@@ -66,8 +77,3 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name
-
-   
-
-
-

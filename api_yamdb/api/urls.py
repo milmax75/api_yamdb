@@ -23,6 +23,6 @@ router_v1.register(
     basename='titles'
 )
 
-urlpatterns = [    
-    path('v1/', include(router_v1.urls)),    
+urlpatterns = [
+    path('v1/', include(router_v1.urls)),
 ]
