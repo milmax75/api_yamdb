@@ -1,5 +1,12 @@
 from rest_framework import serializers
 from review.models import Review, Comment
+from reviews.models import UserCustomized
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = UserCustomized
 
 
 class CommentSerializer(serializers.ModelSerializer):

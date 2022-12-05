@@ -1,8 +1,13 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-from .serializers import ReviewSerializer, CommentSerializer
-from reviews.model import Title, Review
+from .serializers import ReviewSerializer, CommentSerializer, UserSerializer
+from reviews.model import Title, Review, UserCustomized
 from .permissions import IsModerOrAdmOrAuthor
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = UserCustomized.objects.all()
+    serializer_class = UserSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -32,3 +37,4 @@ class CommentViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, id=review_id, title=title_id)
         serializer.save(author=self.request.user, review=review)
+
