@@ -1,13 +1,61 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
-from .serializers import ReviewSerializer, CommentSerializer, UserSerializer
-from reviews.model import Title, Review, UserCustomized
-from .permissions import IsModerOrAdmOrAuthor
+from rest_framework import filters, pagination, viewsets
+from .serializers import ReviewSerializer, CommentSerializer, UserSerializer, \
+    CategoriesSerializer, GenresSerializer, TitlesCreateSerializer, \
+    TitlesReadSerializer
+from reviews.model import Title, Review, UserCustomized, Category, Genre, Avg
+from .permissions import IsModerOrAdmOrAuthor, IsAdminOrReadOnly
+from .mixins import ProjectModelMixin
+from .filters import TitlesFilter, DjangoFilterBackend
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = UserCustomized.objects.all()
     serializer_class = UserSerializer
+
+
+class CategoryViewSet(ProjectModelMixin):
+    """Категории. Чтение  - доступ без токена.
+    Добавление и удаление - только администратор.
+    Поиск по названию категории.
+    """
+    queryset = Category.objects.all()
+    serializer_class = CategoriesSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+
+
+class GenreViewSet(ProjectModelMixin):
+    """Жанры. Чтение  - доступ без токена.
+    Добавление и удаление - только администратор.
+    Поиск по названию жанра.
+    """
+    queryset = Genre.objects.all()
+    serializer_class = GenresSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    """Произведения. Чтение  - доступ без токена.
+    Добавление, обновление и удаление - только администратор.
+    Фильтрация списка произведений по слагу категории, жанра,
+    названию, году.
+    """
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')
+    ).order_by('rating')
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitlesFilter
+    pagination_class = pagination.LimitOffsetPagination
+
+    def get_serializer_class(self):
+        if self.request.method in ('POST', 'PATCH'):
+            return TitlesCreateSerializer
+        return TitlesReadSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -37,4 +85,3 @@ class CommentViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, id=review_id, title=title_id)
         serializer.save(author=self.request.user, review=review)
-

@@ -8,9 +8,14 @@ from rest_framework_simplejwt.views import (
 from api.views import APISign_up, SendToken
 
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+<<<<<<< HEAD
     path('api/', include('api.urls', namespace='api')),
+=======
+    path('api/', include('api.urls')),
+>>>>>>> feature/Category_Genre_Title
     path(
         'redoc/',
         TemplateView.as_view(template_name='redoc.html'),
