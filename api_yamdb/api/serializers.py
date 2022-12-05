@@ -1,14 +1,13 @@
 from rest_framework import serializers
-from review.models import Review
+from review.models import Review, Comment
 
 
-class ReviewSerializer(serializers.ModelSerializer):
-    title = serializers.SlugRelatedField(
-        slug_field='name',
-        read_only=True,
+class CommentSerializer(serializers.ModelSerializer):
+    review = serializers.SlugRelatedField(
+        slug_field='text',
+        read_only=True
     )
     author = serializers.SlugRelatedField(
-        default=serializers.CurrentUserDefault(),
         slug_field='username',
         read_only=True
     )
@@ -21,7 +20,6 @@ class ReviewSerializer(serializers.ModelSerializer):
                 'Нельзя создавать несколько отзывов на произведение'
             )
 
-
     class Meta:
-        model = Review
+        model = Comment
         fields = '__all__'
