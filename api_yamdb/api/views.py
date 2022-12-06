@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, pagination, viewsets
 from .serializers import ReviewSerializer, CommentSerializer, UserSerializer, CategoriesSerializer, GenresSerializer, TitlesCreateSerializer, TitlesReadSerializer
 from reviews.models import Title, Review, UserCustomized, Category, Genre
@@ -37,15 +38,16 @@ class GenreViewSet(ProjectModelMixin):
     search_fields = ('name',)
 
 
+
 class TitleViewSet(viewsets.ModelViewSet):
     """Произведения. Чтение  - доступ без токена.
     Добавление, обновление и удаление - только администратор.
     Фильтрация списка произведений по слагу категории, жанра,
     названию, году.
     """
-    queryset = Title.objects.annotate(
-        rating=Avg('reviews__score')
-    ).order_by('rating')
+    queryset = Title.objects.all().annotate(
+        Avg("reviews__score")
+    ).order_by("name")
     # permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitlesFilter
