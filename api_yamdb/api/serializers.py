@@ -32,19 +32,3 @@ class TokenRequest():
 class TokenRequestSerializer(serializers.Serializer):
     confirmation_code = serializers.CharField(read_only=True)
     username = serializers.SlugField(max_length=150, read_only=True)
-
-    '''class Meta:
-        fields = ('username', 'confirmation_code')
-        model = UserCustomized'''
-
-    '''def get_confirmation_code(self, obj):
-        return self.confirmation_code'''
-
-
-'''class TokenResponse():
-    def __init__(self, access_token):
-        self.access_token = access_token'''
-
-
-class TokenResponseSerializer(serializers.Serializer):
-    access_token = serializers.CharField()

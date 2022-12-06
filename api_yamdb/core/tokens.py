@@ -8,9 +8,6 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-from api.serializers import TokenResponseSerializer
-
-
 def send_conf_code(username):
     user = UserCustomized.objects.get(username=username)
     confirmation_code = default_token_generator.make_token(user)
@@ -29,9 +26,6 @@ def code_check(username, confirmation_code):
         confirmation_code
     ):
         raise ValidationError({"confirmation_code": _("Invalid token")})
-    token_serializer = TokenResponseSerializer(data=access_token)
-    if token_serializer.is_valid():
-        return Response(data=token_serializer.data,
-                        status=status.HTTP_200_OK)
-    return Response(token_serializer.errors,
-                    status=status.HTTP_400_BAD_REQUEST)
+    return Response({'token': str(access_token)},
+                    status=status.HTTP_200_OK)
+

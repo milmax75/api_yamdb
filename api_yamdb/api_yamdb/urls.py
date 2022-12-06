@@ -20,7 +20,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
 )
 # from api.views import UserSignUpViewSet
-from api.views import APISign_up, SendToken
+from api.views import APISign_up, SendToken  #, UserMeViewSet
 
 
 urlpatterns = [
@@ -34,3 +34,5 @@ urlpatterns = [
     path('api/v1/auth/signup/', APISign_up.as_view()),
     path('api/v1/auth/token/', SendToken.as_view()),
 ]
+
+# path('api/v1/users/me/', UserMeViewSet)
