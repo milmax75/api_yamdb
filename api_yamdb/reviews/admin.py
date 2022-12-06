@@ -1,13 +1,10 @@
 from django.contrib import admin
-<<<<<<< HEAD
 
 from django.contrib.auth.admin import UserAdmin
 from .models import UserCustomized
+from .models import Category, Genre, Title
 
 admin.site.register(UserCustomized, UserAdmin)
-
-=======
-from .models import Category, Genre, Title
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -40,4 +37,4 @@ class TitleAdmin(admin.ModelAdmin):
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Genre, GenreAdmin)
 admin.site.register(Title, TitleAdmin)
->>>>>>> feature/Category_Genre_Title
+

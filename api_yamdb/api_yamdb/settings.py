@@ -22,17 +22,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< HEAD
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
-    'reviews',
-    'api',
-=======
     'django_filters',
     'reviews.apps.ReviewsConfig',
     'api.apps.ApiConfig',
->>>>>>> feature/Category_Genre_Title
 ]
 
 MIDDLEWARE = [
@@ -127,7 +122,6 @@ REST_FRAMEWORK = {
     )
 }
 SIMPLE_JWT = {
-    # Устанавливаем срок жизни токена
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
