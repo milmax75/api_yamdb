@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from reviews.models import Review, Comment, Category, Genre, Title
 from reviews.models import UserCustomized
@@ -15,8 +16,9 @@ class ReviewSerializer(serializers.ModelSerializer):
     )
 
     def validate(self, data):
-        title = int(data['title'])
+        title_id = self.context['view'].kwargs["title_id"]
         author = self.context['request'].user
+        title = get_object_or_404(Title, pk=title_id)
         if Review.objects.filter(title=title, author=author).exists():
             raise serializers.ValidationError(
                 'Нельзя создавать несколько отзывов на произведение'
