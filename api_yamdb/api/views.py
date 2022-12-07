@@ -11,6 +11,7 @@ from django.contrib.auth.tokens import default_token_generator
 from rest_framework_simplejwt.tokens import AccessToken
 from django.core.exceptions import ValidationError
 from rest_framework import permissions
+from django.core.exceptions import ObjectDoesNotExist
 
 
 from reviews.models import UserCustomized
@@ -30,19 +31,17 @@ class UserViewSet(viewsets.ModelViewSet):
     def me(self, request, pk=None):
         user = get_object_or_404(UserCustomized,
                                  username=request.user.username)
-        
         if request.method == "GET":
             serializer = UserSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         if request.method == "PATCH":
-            serializer = UserSerializer(data=request.data, partial=True)
+            serializer = UserSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
-        '''else:
-            '''
+
 
 '''class UserMeViewSet(viewsets.ModelViewSet):
     # queryset = UserCustomized.objects.all()
@@ -57,12 +56,16 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class APISign_up(APIView):
+    permission_classes = (permissions.AllowAny,)
+
     def post(self, request):
         data = request.data
         serializer = UserSignUpSerializer(data=data)
+        reg_user = UserCustomized.objects.filter(username=data['username'])
         if serializer.is_valid():
             serializer.save()
-            send_conf_code(serializer.data['username'])
+            if request.user.is_anonymous:
+                send_conf_code(serializer.data['username'])
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

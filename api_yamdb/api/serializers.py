@@ -11,16 +11,26 @@ class UserSerializer(serializers.ModelSerializer):
         model = UserCustomized
 
 
-class UserSignUpSerializer(serializers.ModelSerializer):
+class UserSignUpSerializer(serializers.Serializer):
 
-    class Meta:
-        model = UserCustomized
-        fields = ('email', 'username')
+    username = serializers.SlugField(max_length=150)
+    email = serializers.EmailField(max_length=254)
 
     def validate_username(self, value):
         if (value == 'me'):
-            raise serializers.ValidationError('Недопустимое имя пользователя')
+            raise serializers.ValidationError("Invalid username")
+        elif UserCustomized.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Such username already exists")
         return value
+
+    def validate_email(self, value):
+        email = value.lower()
+        if UserCustomized.objects.filter(email=email).exists():
+            raise serializers.ValidationError("Such email already exists")
+        return email
+
+    def create(self, validated_data):
+        return UserCustomized.objects.create(**validated_data)
 
 
 class TokenRequest():

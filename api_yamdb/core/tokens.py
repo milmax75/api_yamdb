@@ -28,4 +28,3 @@ def code_check(username, confirmation_code):
         raise ValidationError({"confirmation_code": _("Invalid token")})
     return Response({'token': str(access_token)},
                     status=status.HTTP_200_OK)
-
