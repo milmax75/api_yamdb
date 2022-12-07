@@ -24,6 +24,7 @@ class CategoryViewSet(ProjectModelMixin):
     # permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    lookup_field = 'slug'
 
 
 class GenreViewSet(ProjectModelMixin):
@@ -36,7 +37,7 @@ class GenreViewSet(ProjectModelMixin):
     # permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-
+    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -47,7 +48,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     """
     queryset = Title.objects.all().annotate(
         Avg("reviews__score")
-    ).order_by("name")
+    ).order_by("year")
     # permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitlesFilter
