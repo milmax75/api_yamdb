@@ -9,7 +9,8 @@ from django.contrib.auth.tokens import default_token_generator
 from rest_framework_simplejwt.tokens import AccessToken
 from django.core.exceptions import ValidationError
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, pagination, viewsets, permissions, status
+from rest_framework import filters, viewsets, permissions, status
+from rest_framework.pagination import PageNumberPagination
 
 from .serializers import (
     UserSerializer,
@@ -35,6 +36,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = UserCustomized.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdmin,)
+    pagination_class = PageNumberPagination
 
     @action(detail=False, methods=['get', 'patch'],
             permission_classes=[permissions.IsAuthenticated])
@@ -100,6 +102,7 @@ class CategoryViewSet(ProjectModelMixin):
     queryset = Category.objects.all()
     serializer_class = CategoriesSerializer
     permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -113,6 +116,7 @@ class GenreViewSet(ProjectModelMixin):
     queryset = Genre.objects.all()
     serializer_class = GenresSerializer
     permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -127,10 +131,10 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(
         Avg("reviews__score")
     ).order_by("year")
-    # permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitlesFilter
-    pagination_class = pagination.LimitOffsetPagination
 
     def get_serializer_class(self):
         if self.request.method in ('POST', 'PATCH'):
@@ -141,7 +145,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [IsModerOrAdmOrAuthor]
-    pagination_class = pagination.LimitOffsetPagination
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
@@ -155,7 +159,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    pagination_class = pagination.LimitOffsetPagination
+    pagination_class = PageNumberPagination
     permission_classes = [IsModerOrAdmOrAuthor]
 
     def get_queryset(self):
