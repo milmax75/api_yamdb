@@ -22,8 +22,9 @@ from .serializers import (
     TitlesCreateSerializer,
     TitlesReadSerializer
 )
-from core.tokens import send_conf_code, code_check
-from reviews.models import Title, Review, UserCustomized, Category, Genre, UserCustomized
+from core.tokens import send_conf_code
+from reviews.models import Title, Review, UserCustomized, Category, Genre, \
+    UserCustomized
 from .permissions import IsModerOrAdmOrAuthor, IsAdminOrReadOnly, IsAdmin
 from .mixins import ProjectModelMixin
 from .filters import TitlesFilter
@@ -35,8 +36,9 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsAdmin,)
 
-    @action(detail=False, methods=['get', 'patch'])
-    def me(self, request, pk=None):
+    @action(detail=False, methods=['get', 'patch'],
+            permission_classes=[permissions.IsAuthenticated])
+    def me(self, request):
         user = get_object_or_404(UserCustomized,
                                  username=request.user.username)
         if request.method == "GET":
@@ -57,7 +59,6 @@ class APISign_up(APIView):
     def post(self, request):
         data = request.data
         serializer = UserSignUpSerializer(data=data)
-        reg_user = UserCustomized.objects.filter(username=data['username'])
         if serializer.is_valid():
             serializer.save()
             if request.user.is_anonymous:
@@ -80,10 +81,11 @@ class SendToken(APIView):
             access_token = AccessToken.for_user(user)
             confirmation_code = data['confirmation_code']
             if not default_token_generator.check_token(
-                user,
-                confirmation_code
+                    user,
+                    confirmation_code
             ):
-                raise ValidationError({"confirmation_code": _("Invalid token")})
+                raise ValidationError(
+                    {"confirmation_code": _("Invalid token")})
             return Response({'token': str(access_token)},
                             status=status.HTTP_200_OK)
         return Response(serializer.errors,
@@ -97,7 +99,7 @@ class CategoryViewSet(ProjectModelMixin):
     """
     queryset = Category.objects.all()
     serializer_class = CategoriesSerializer
-    # permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -110,7 +112,7 @@ class GenreViewSet(ProjectModelMixin):
     """
     queryset = Genre.objects.all()
     serializer_class = GenresSerializer
-    # permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -138,7 +140,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    # permission_classes = [IsModerOrAdmOrAuthor]
+    permission_classes = [IsModerOrAdmOrAuthor]
     pagination_class = pagination.LimitOffsetPagination
 
     def get_queryset(self):
@@ -154,8 +156,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = pagination.LimitOffsetPagination
-
-    # permission_classes = [IsModerOrAdmOrAuthor]
+    permission_classes = [IsModerOrAdmOrAuthor]
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get("review_id"))

@@ -6,7 +6,6 @@ from reviews.models import UserCustomized
 def send_conf_code(username):
     user = UserCustomized.objects.get(username=username)
     confirmation_code = default_token_generator.make_token(user)
-    print(confirmation_code)
     subject = 'Your confirmation code'
     message = confirmation_code
     email_from = 'admin@admin.com'
