@@ -6,6 +6,7 @@ from .validators import validate_year
 
 class UserCustomized(AbstractUser):
     '''Детальная информация о пользователе'''
+
     USER = 'user'
     MODERATOR = 'moderator'
     ADMIN = 'admin'
@@ -14,6 +15,7 @@ class UserCustomized(AbstractUser):
         (MODERATOR, 'moderator'),
         (ADMIN, 'admin')
     ]
+
     username = models.SlugField(max_length=150,
                                 unique=True,
                                 blank=False,
@@ -25,6 +27,7 @@ class UserCustomized(AbstractUser):
     role = models.CharField(max_length=10,
                             choices=ROLE_CHOICES,
                             default='user')
+
 
     @property
     def is_moderator(self):
