@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
+    'django_filters',
     'reviews',
     'api',
 ]
@@ -120,6 +121,7 @@ REST_FRAMEWORK = {
 }
 SIMPLE_JWT = {
     # Устанавливаем срок жизни токена
+
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
