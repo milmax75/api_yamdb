@@ -21,11 +21,13 @@ from .serializers import (
     TokenRequestSerializer,
 )
 from core.tokens import send_conf_code, code_check
+from api.permissions import IsAdmin
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = UserCustomized.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (IsAdmin,)
 
     @action(detail=False, methods=['get', 'patch'])
     def me(self, request, pk=None):
@@ -73,6 +75,9 @@ class APISign_up(APIView):
 class SendToken(APIView):
     '''получает confirmation_code, проверяет его и высылает токен
     если полее некорректно - 400, если пользователь не найден - 404'''
+
+    permission_classes = (permissions.AllowAny,)
+
     def post(self, request):
         data = request.data
         serializer = TokenRequestSerializer(data=data)
