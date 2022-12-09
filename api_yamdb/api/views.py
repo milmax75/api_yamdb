@@ -5,7 +5,6 @@ from rest_framework import permissions
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework_simplejwt.tokens import AccessToken
-from django.core.exceptions import ValidationError
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets, permissions, status
 from rest_framework.pagination import PageNumberPagination
@@ -19,7 +18,8 @@ from .serializers import (
     CategoriesSerializer,
     GenresSerializer,
     TitlesCreateSerializer,
-    TitlesReadSerializer
+    TitlesReadSerializer,
+    UserRoleSerializer
 )
 from core.tokens import send_conf_code
 from reviews.models import Title, Review, UserCustomized, Category, Genre, \
@@ -55,10 +55,20 @@ class UserViewSet(viewsets.ModelViewSet):
     def me(self, request):
         user = get_object_or_404(UserCustomized,
                                  username=request.user.username)
+        # role = user.role
         if request.method == "GET":
             serializer = UserSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         if request.method == "PATCH":
+            if (not self.request.user.is_admin
+                and not self.request.user.is_superuser):
+                serializer = UserRoleSerializer(user, data=request.data,
+                                                partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response(serializer.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
             serializer = UserSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()

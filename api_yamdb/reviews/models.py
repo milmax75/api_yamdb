@@ -25,7 +25,6 @@ class UserCustomized(AbstractUser):
     role = models.CharField(max_length=10,
                             choices=ROLE_CHOICES,
                             default='user')
-    # password = None
 
     @property
     def is_moderator(self):

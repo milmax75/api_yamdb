@@ -1,11 +1,8 @@
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-)
-# from api.views import UserSignUpViewSet
-from api.views import APISign_up, SendToken  #, UserMeViewSet
+
+from api.views import APISign_up, SendToken
 
 
 urlpatterns = [

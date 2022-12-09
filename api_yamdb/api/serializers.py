@@ -49,13 +49,22 @@ class UserSerializer(serializers.ModelSerializer):
         )
         model = UserCustomized
 
-        '''def validate_role(self, value):
-        if (value == 'user'):
-            role(read)
-            raise serializers.ValidationError("Invalid username")
-        elif UserCustomized.objects.filter(username=value).exists():
-            raise serializers.ValidationError("Such username already exists")
-        return value'''
+
+class UserRoleSerializer(serializers.ModelSerializer):
+
+    # role = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = UserCustomized
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role'
+        )
+        read_only_fields = ('role',)
 
 
 class UserSignUpSerializer(serializers.Serializer):
