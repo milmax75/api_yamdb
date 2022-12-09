@@ -1,10 +1,8 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import CreateAPIView
 from rest_framework import permissions
 from django.shortcuts import get_object_or_404
-from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework_simplejwt.tokens import AccessToken
 from django.core.exceptions import ValidationError
@@ -37,6 +35,20 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsAdmin,)
     pagination_class = PageNumberPagination
+    lookup_field = 'username'
+
+    def create_user(username, email, first_name, last_name, bio, role):
+        user = UserCustomized(
+            username=username,
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            bio=bio,
+            role=role
+        )
+        user.set_unusable_password()
+        user.save()
+        return user
 
     @action(detail=False, methods=['get', 'patch'],
             permission_classes=[permissions.IsAuthenticated])
@@ -79,15 +91,16 @@ class SendToken(APIView):
         data = request.data
         serializer = TokenRequestSerializer(data=data)
         if serializer.is_valid():
-            user = get_object_or_404(UserCustomized, username=data['username'])
+            user = get_object_or_404(UserCustomized,
+                                     username=data.get('username'))
             access_token = AccessToken.for_user(user)
             confirmation_code = data['confirmation_code']
             if not default_token_generator.check_token(
                     user,
                     confirmation_code
             ):
-                raise ValidationError(
-                    {"confirmation_code": _("Invalid token")})
+                return Response(serializer.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
             return Response({'token': str(access_token)},
                             status=status.HTTP_200_OK)
         return Response(serializer.errors,

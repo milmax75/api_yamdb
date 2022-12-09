@@ -1,6 +1,13 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from reviews.models import Review, Comment, Category, Genre, Title, UserCustomized
+from reviews.models import (
+    Review,
+    Comment,
+    Category,
+    Genre,
+    Title,
+    UserCustomized
+)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -32,13 +39,29 @@ class ReviewSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = '__all__'
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role'
+        )
         model = UserCustomized
+
+        '''def validate_role(self, value):
+        if (value == 'user'):
+            role(read)
+            raise serializers.ValidationError("Invalid username")
+        elif UserCustomized.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Such username already exists")
+        return value'''
 
 
 class UserSignUpSerializer(serializers.Serializer):
 
     username = serializers.SlugField(max_length=150)
+    # role = serializers.CharField(max_length=10, default='user')
     email = serializers.EmailField(max_length=254)
 
     def validate_username(self, value):
@@ -65,8 +88,8 @@ class TokenRequest():
 
 
 class TokenRequestSerializer(serializers.Serializer):
-    confirmation_code = serializers.CharField(read_only=True)
-    username = serializers.SlugField(max_length=150, read_only=True)
+    confirmation_code = serializers.CharField()
+    username = serializers.SlugField(max_length=150)
 
 
 class CategoriesSerializer(serializers.ModelSerializer):

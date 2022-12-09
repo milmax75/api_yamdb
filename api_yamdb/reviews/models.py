@@ -17,17 +17,15 @@ class UserCustomized(AbstractUser):
     ]
 
     username = models.SlugField(max_length=150,
-                                unique=True,
-                                blank=False,
-                                null=False)
-    email = models.EmailField(max_length=254, unique=True, null=False)
-    first_name = models.TextField(max_length=150)
-    last_name = models.TextField(max_length=150)
-    bio = models.CharField(max_length=500)
+                                unique=True)
+    email = models.EmailField(max_length=254, unique=True)
+    first_name = models.TextField(max_length=150, blank=True)
+    last_name = models.TextField(max_length=150, blank=True)
+    bio = models.CharField(max_length=500, blank=True)
     role = models.CharField(max_length=10,
                             choices=ROLE_CHOICES,
                             default='user')
-
+    # password = None
 
     @property
     def is_moderator(self):

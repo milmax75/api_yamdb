@@ -8,9 +8,6 @@ from rest_framework_simplejwt.views import (
 from api.views import APISign_up, SendToken  #, UserMeViewSet
 
 
-
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls', namespace='api')),
