@@ -88,12 +88,6 @@ class UserSignUpSerializer(serializers.Serializer):
         return UserCustomized.objects.create(**validated_data)
 
 
-class TokenRequest:
-    def __init__(self, confirmation_code, username):
-        self.confirmation_code = confirmation_code
-        self.username = username
-
-
 class TokenRequestSerializer(serializers.Serializer):
     confirmation_code = serializers.CharField()
     username = serializers.SlugField(max_length=150)
