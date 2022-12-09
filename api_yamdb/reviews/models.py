@@ -5,8 +5,6 @@ from .validators import validate_year
 
 
 class UserCustomized(AbstractUser):
-    '''Детальная информация о пользователе'''
-
     USER = 'user'
     MODERATOR = 'moderator'
     ADMIN = 'admin'
@@ -76,7 +74,7 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField('название', max_length=256)
     year = models.IntegerField(
-        verbose_name= 'год',
+        verbose_name='год',
         max_length=4,
         validators=[validate_year]
     )

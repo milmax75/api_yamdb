@@ -1,14 +1,12 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import permissions
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework_simplejwt.tokens import AccessToken
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets, permissions, status
 from rest_framework.pagination import PageNumberPagination
-
 from .serializers import (
     UserSerializer,
     UserSignUpSerializer,
@@ -55,13 +53,12 @@ class UserViewSet(viewsets.ModelViewSet):
     def me(self, request):
         user = get_object_or_404(UserCustomized,
                                  username=request.user.username)
-        # role = user.role
         if request.method == "GET":
             serializer = UserSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         if request.method == "PATCH":
             if (not self.request.user.is_admin
-                and not self.request.user.is_superuser):
+                    and not self.request.user.is_superuser):
                 serializer = UserRoleSerializer(user, data=request.data,
                                                 partial=True)
                 if serializer.is_valid():
@@ -77,7 +74,7 @@ class UserViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
-class APISign_up(APIView):
+class APISignUp(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
@@ -92,9 +89,6 @@ class APISign_up(APIView):
 
 
 class SendToken(APIView):
-    '''получает confirmation_code, проверяет его и высылает токен
-    если полее некорректно - 400, если пользователь не найден - 404'''
-
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
@@ -118,10 +112,6 @@ class SendToken(APIView):
 
 
 class CategoryViewSet(ProjectModelMixin):
-    """Категории. Чтение  - доступ без токена.
-    Добавление и удаление - только администратор.
-    Поиск по названию категории.
-    """
     queryset = Category.objects.all()
     serializer_class = CategoriesSerializer
     permission_classes = (IsAdminOrReadOnly,)
@@ -132,10 +122,6 @@ class CategoryViewSet(ProjectModelMixin):
 
 
 class GenreViewSet(ProjectModelMixin):
-    """Жанры. Чтение  - доступ без токена.
-    Добавление и удаление - только администратор.
-    Поиск по названию жанра.
-    """
     queryset = Genre.objects.all()
     serializer_class = GenresSerializer
     permission_classes = (IsAdminOrReadOnly,)
@@ -146,11 +132,6 @@ class GenreViewSet(ProjectModelMixin):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    """Произведения. Чтение  - доступ без токена.
-    Добавление, обновление и удаление - только администратор.
-    Фильтрация списка произведений по слагу категории, жанра,
-    названию, году.
-    """
     queryset = Title.objects.all().annotate(
         Avg("reviews__score")
     ).order_by("year")

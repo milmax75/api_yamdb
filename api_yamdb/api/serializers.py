@@ -1,4 +1,3 @@
-from django.http import request
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 from reviews.models import (
@@ -40,7 +39,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         fields = (
             'username',
@@ -54,7 +52,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserRoleSerializer(serializers.ModelSerializer):
-
     # role = serializers.CharField(read_only=True)
 
     class Meta:
@@ -71,12 +68,11 @@ class UserRoleSerializer(serializers.ModelSerializer):
 
 
 class UserSignUpSerializer(serializers.Serializer):
-
     username = serializers.SlugField(max_length=150)
     email = serializers.EmailField(max_length=254)
 
     def validate_username(self, value):
-        if (value == 'me'):
+        if value == 'me':
             raise serializers.ValidationError("Invalid username")
         elif UserCustomized.objects.filter(username=value).exists():
             raise serializers.ValidationError("Such username already exists")
@@ -92,7 +88,7 @@ class UserSignUpSerializer(serializers.Serializer):
         return UserCustomized.objects.create(**validated_data)
 
 
-class TokenRequest():
+class TokenRequest:
     def __init__(self, confirmation_code, username):
         self.confirmation_code = confirmation_code
         self.username = username
