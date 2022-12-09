@@ -1,5 +1,6 @@
-from django.shortcuts import get_object_or_404
+from django.http import request
 from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
 from reviews.models import (
     Review,
     Comment,
@@ -22,13 +23,15 @@ class ReviewSerializer(serializers.ModelSerializer):
     )
 
     def validate(self, data):
+        request = self.context['request']
         title_id = self.context['view'].kwargs["title_id"]
         author = self.context['request'].user
         title = get_object_or_404(Title, pk=title_id)
-        if Review.objects.filter(title=title, author=author).exists():
-            raise serializers.ValidationError(
-                'Нельзя создавать несколько отзывов на произведение'
-            )
+        if request.method == 'POST':
+            if Review.objects.filter(title=title, author=author).exists():
+                raise serializers.ValidationError(
+                    'Нельзя создавать несколько отзывов на произведение'
+                )
         return data
 
     class Meta:
@@ -70,7 +73,6 @@ class UserRoleSerializer(serializers.ModelSerializer):
 class UserSignUpSerializer(serializers.Serializer):
 
     username = serializers.SlugField(max_length=150)
-    # role = serializers.CharField(max_length=10, default='user')
     email = serializers.EmailField(max_length=254)
 
     def validate_username(self, value):
@@ -119,7 +121,9 @@ class TitlesReadSerializer(serializers.ModelSerializer):
         read_only=True,
         many=True
     )
-    rating = serializers.IntegerField(read_only=True)
+    rating = serializers.IntegerField(
+        source='reviews__score__avg', read_only=True
+    )
 
     class Meta:
         model = Title
