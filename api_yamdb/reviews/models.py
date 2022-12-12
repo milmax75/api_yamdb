@@ -50,7 +50,7 @@ class Genre(GenreCategoryModel):
 class Title(models.Model):
     name = models.CharField('название', max_length=256)
     year = models.IntegerField(
-        verbose_name='год',        
+        verbose_name='год',
         validators=[validate_year]
     )
     description = models.TextField(

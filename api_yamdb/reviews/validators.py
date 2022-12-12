@@ -17,13 +17,3 @@ def validate_username(value):
             'Enter a valid username',
             params={'value': value},
         )
-
-'''class UsernameRegexValidator(
-    regex=r'^[\w.@+-]+\z',
-    message='Enter a valid value',
-    code=None,
-    inverse_match=None,
-    flags=re.M
-):
-
-    pass'''
