@@ -127,21 +127,11 @@ class SendToken(APIView):
 class CategoryViewSet(ProjectModelMixin):
     queryset = Category.objects.all()
     serializer_class = CategoriesSerializer
-    permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = PageNumberPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
 
 
 class GenreViewSet(ProjectModelMixin):
     queryset = Genre.objects.all()
     serializer_class = GenresSerializer
-    permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = PageNumberPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):

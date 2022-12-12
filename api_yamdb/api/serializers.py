@@ -24,10 +24,10 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         request = self.context['request']
-        title_id = self.context['view'].kwargs["title_id"]
-        author = self.context['request'].user
-        title = get_object_or_404(Title, pk=title_id)
         if request.method == 'POST':
+            title_id = self.context['view'].kwargs["title_id"]
+            author = self.context['request'].user
+            title = get_object_or_404(Title, pk=title_id)
             if Review.objects.filter(title=title, author=author).exists():
                 raise serializers.ValidationError(
                     'Нельзя создавать несколько отзывов на произведение'
