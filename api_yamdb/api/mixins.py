@@ -3,6 +3,7 @@ from rest_framework.pagination import PageNumberPagination
 
 from .permissions import IsAdminOrReadOnly
 
+
 class ProjectModelMixin(mixins.CreateModelMixin,
                         mixins.DestroyModelMixin,
                         mixins.ListModelMixin,
@@ -13,4 +14,3 @@ class ProjectModelMixin(mixins.CreateModelMixin,
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
-    

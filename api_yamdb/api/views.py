@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework_simplejwt.tokens import AccessToken
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets, permissions, status
+from rest_framework import viewsets, permissions, status
 from rest_framework.pagination import PageNumberPagination
 from .serializers import (
     UserSerializer,
