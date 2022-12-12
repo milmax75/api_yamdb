@@ -8,6 +8,7 @@ from reviews.models import (
     Title,
     UserCustomized
 )
+from reviews.validators import validate_username
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -74,23 +75,13 @@ class UserSignUpSerializer(serializers.Serializer):
     def validate_username(self, value):
         if value == 'me':
             raise serializers.ValidationError("Invalid username")
-        elif UserCustomized.objects.filter(username=value).exists():
-            raise serializers.ValidationError("Such username already exists")
         return value
-
-    def validate_email(self, value):
-        email = value.lower()
-        if UserCustomized.objects.filter(email=email).exists():
-            raise serializers.ValidationError("Such email already exists")
-        return email
-
-    def create(self, validated_data):
-        return UserCustomized.objects.create(**validated_data)
 
 
 class TokenRequestSerializer(serializers.Serializer):
     confirmation_code = serializers.CharField()
-    username = serializers.SlugField(max_length=150)
+    username = serializers.CharField(max_length=150,
+                                     validators=[validate_username])
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
