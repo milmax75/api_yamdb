@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+import re
 
 
 def validate_year(value):
@@ -8,3 +9,21 @@ def validate_year(value):
             'Неверный год. Произведения из будущего пока не принимаются.',
             params={'value': value},
         )
+
+
+def validate_username(value):
+    if not re.compile(r'[\w.@+-]+').match(value):
+        raise ValidationError(
+            'Enter a valid username',
+            params={'value': value},
+        )
+
+'''class UsernameRegexValidator(
+    regex=r'^[\w.@+-]+\z',
+    message='Enter a valid value',
+    code=None,
+    inverse_match=None,
+    flags=re.M
+):
+
+    pass'''

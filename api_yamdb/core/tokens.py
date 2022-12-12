@@ -8,5 +8,4 @@ def send_conf_code(username):
     confirmation_code = default_token_generator.make_token(user)
     subject = 'Your confirmation code'
     message = confirmation_code
-    email_from = 'admin@admin.com'
-    send_mail(subject, message, email_from, [user.email], fail_silently=False,)
+    send_mail(subject, message, None, [user.email], fail_silently=False,)

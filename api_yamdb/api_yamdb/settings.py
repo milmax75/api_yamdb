@@ -128,3 +128,6 @@ SIMPLE_JWT = {
 }
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails/')
+DEFAULT_FROM_EMAIL = 'admin@fakemail.fake'
+EMAIL_HOST = 'smtp.fakemail.fake'
+EMAIL_HOST_USER = 'admin@fakemail.fake'

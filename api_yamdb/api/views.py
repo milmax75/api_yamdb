@@ -19,6 +19,8 @@ from .serializers import (
     TitlesReadSerializer,
     UserRoleSerializer
 )
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from core.tokens import send_conf_code
 from reviews.models import Title, Review, UserCustomized, Category, Genre, \
     UserCustomized
@@ -56,20 +58,22 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.method == "GET":
             serializer = UserSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        if request.method == "PATCH":
-            if (not self.request.user.is_admin
-                    and not self.request.user.is_superuser):
-                serializer = UserRoleSerializer(user, data=request.data,
-                                                partial=True)
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response(serializer.data, status=status.HTTP_200_OK)
-                return Response(serializer.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
-            serializer = UserSerializer(user, data=request.data, partial=True)
-            if serializer.is_valid():
+        if not (self.request.user.is_admin or self.request.user.is_superuser):
+            serializer = UserRoleSerializer(user, data=request.data,
+                                            partial=True)
+            try:
+                serializer.is_valid()
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
+            except ValidationError:
+                return Response(serializer.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        try:
+            serializer.is_valid()
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ValidationError:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -81,8 +85,17 @@ class APISignUp(APIView):
         data = request.data
         serializer = UserSignUpSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
-            if request.user.is_anonymous:
+            email = serializer.validated_data.get('email')
+            username = serializer.validated_data.get('username')
+            try:
+                obj, created = UserCustomized.objects.get_or_create(
+                    email=email,
+                    username=username
+                )
+            except IntegrityError:
+                return Response(serializer.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
+            if request.user.is_anonymous or created is not True:
                 send_conf_code(serializer.data['username'])
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -94,7 +107,7 @@ class SendToken(APIView):
     def post(self, request):
         data = request.data
         serializer = TokenRequestSerializer(data=data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             user = get_object_or_404(UserCustomized,
                                      username=data.get('username'))
             access_token = AccessToken.for_user(user)

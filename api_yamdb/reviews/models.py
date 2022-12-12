@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
-from .validators import validate_year
+from .validators import validate_year, validate_username
 from core.models import CreatedModel, GenreCategoryModel
 
 
@@ -15,8 +15,9 @@ class UserCustomized(AbstractUser):
         (ADMIN, 'admin'),
     ]
 
-    username = models.SlugField(max_length=150,
-                                unique=True)
+    username = models.CharField(max_length=150,
+                                unique=True,
+                                validators=[validate_username])
     email = models.EmailField(max_length=254, unique=True)
     first_name = models.TextField(max_length=150, blank=True)
     last_name = models.TextField(max_length=150, blank=True)
