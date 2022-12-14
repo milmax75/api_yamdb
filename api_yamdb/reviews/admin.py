@@ -19,7 +19,7 @@ class UserResource(resources.ModelResource):
 
 
 class UserAdmin(ImportExportModelAdmin):
-    resource_classes = [UserResource]
+    resource_classes = (UserResource,)
     list_display = (
         'id',
         'username',

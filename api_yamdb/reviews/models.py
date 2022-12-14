@@ -9,15 +9,15 @@ class UserCustomized(AbstractUser):
     USER = 'user'
     MODERATOR = 'moderator'
     ADMIN = 'admin'
-    ROLE_CHOICES = [
+    ROLE_CHOICES = (
         (USER, 'user'),
         (MODERATOR, 'moderator'),
         (ADMIN, 'admin'),
-    ]
+    )
 
     username = models.CharField(max_length=150,
                                 unique=True,
-                                validators=[validate_username])
+                                validators=(validate_username,))
     email = models.EmailField(max_length=254, unique=True)
     first_name = models.TextField(max_length=150, blank=True)
     last_name = models.TextField(max_length=150, blank=True)
@@ -51,7 +51,7 @@ class Title(models.Model):
     name = models.CharField('название', max_length=256)
     year = models.IntegerField(
         verbose_name='год',
-        validators=[validate_year]
+        validators=(validate_year,)
     )
     description = models.TextField(
         verbose_name='Описание',
@@ -103,22 +103,22 @@ class Review(CreatedModel):
     )
     score = models.IntegerField(
         verbose_name='Рейтинг',
-        validators=[
+        validators=(
             MinValueValidator(1),
             MaxValueValidator(10),
-        ]
+        )
     )
 
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-        ordering = ['pub_date']
-        constraints = [
+        ordering = ('pub_date',)
+        constraints = (
             models.UniqueConstraint(
-                fields=['title', 'author'],
+                fields=('title', 'author'),
                 name='unique_review'
             ),
-        ]
+        )
 
 
 class Comment(CreatedModel):
@@ -138,4 +138,4 @@ class Comment(CreatedModel):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-        ordering = ['pub_date']
+        ordering = ('pub_date',)

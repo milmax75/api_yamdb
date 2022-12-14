@@ -19,7 +19,6 @@ from .serializers import (
     TitlesReadSerializer,
     UserRoleSerializer
 )
-from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from core.tokens import send_conf_code
 from reviews.models import Title, Review, UserCustomized, Category, Genre, \
@@ -50,8 +49,8 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
         return user
 
-    @action(detail=False, methods=['get', 'patch'],
-            permission_classes=[permissions.IsAuthenticated])
+    @action(detail=False, methods=('get', 'patch'),
+            permission_classes=(permissions.IsAuthenticated,))
     def me(self, request):
         user = get_object_or_404(UserCustomized,
                                  username=request.user.username)
@@ -61,21 +60,13 @@ class UserViewSet(viewsets.ModelViewSet):
         if not (self.request.user.is_admin or self.request.user.is_superuser):
             serializer = UserRoleSerializer(user, data=request.data,
                                             partial=True)
-            try:
-                serializer.is_valid()
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            except ValidationError:
-                return Response(serializer.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
-        serializer = UserSerializer(user, data=request.data, partial=True)
-        try:
-            serializer.is_valid()
+            serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except ValidationError:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class APISignUp(APIView):
@@ -84,21 +75,20 @@ class APISignUp(APIView):
     def post(self, request):
         data = request.data
         serializer = UserSignUpSerializer(data=data)
-        if serializer.is_valid():
-            email = serializer.validated_data.get('email')
-            username = serializer.validated_data.get('username')
-            try:
-                obj, created = UserCustomized.objects.get_or_create(
-                    email=email,
-                    username=username
-                )
-            except IntegrityError:
-                return Response(serializer.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
-            if request.user.is_anonymous or created is not True:
-                send_conf_code(serializer.data['username'])
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data.get('email')
+        username = serializer.validated_data.get('username')
+        try:
+            obj, created = UserCustomized.objects.get_or_create(
+                email=email,
+                username=username
+            )
+        except IntegrityError:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+        if request.user.is_anonymous or created is not True:
+            send_conf_code(serializer.data['username'])
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class SendToken(APIView):
@@ -107,21 +97,19 @@ class SendToken(APIView):
     def post(self, request):
         data = request.data
         serializer = TokenRequestSerializer(data=data)
-        if serializer.is_valid(raise_exception=True):
-            user = get_object_or_404(UserCustomized,
-                                     username=data.get('username'))
-            access_token = AccessToken.for_user(user)
-            confirmation_code = data['confirmation_code']
-            if not default_token_generator.check_token(
-                    user,
-                    confirmation_code
-            ):
-                return Response(serializer.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
-            return Response({'token': str(access_token)},
-                            status=status.HTTP_200_OK)
-        return Response(serializer.errors,
-                        status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        user = get_object_or_404(UserCustomized,
+                                 username=data.get('username'))
+        access_token = AccessToken.for_user(user)
+        confirmation_code = data['confirmation_code']
+        if not default_token_generator.check_token(
+                user,
+                confirmation_code
+        ):
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+        return Response({'token': str(access_token)},
+                        status=status.HTTP_200_OK)
 
 
 class CategoryViewSet(ProjectModelMixin):
@@ -151,7 +139,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsModerOrAdmOrAuthor]
+    permission_classes = (IsModerOrAdmOrAuthor,)
     pagination_class = PageNumberPagination
 
     def get_queryset(self):
@@ -167,7 +155,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = PageNumberPagination
-    permission_classes = [IsModerOrAdmOrAuthor]
+    permission_classes = (IsModerOrAdmOrAuthor,)
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get("review_id"))
