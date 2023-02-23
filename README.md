@@ -1,6 +1,9 @@
 # api_yamdb
 api_yamdb
-'''Проект YaMDb создан для размещения отзывов пользователей на произведения, размещенных на любых других ресурсах. Сами произведения в YaMDb не хранятся, здесь нельзя посмотреть фильм или послушать музыку.
+''' The YaMDb project was created to post user reviews on works posted on any other resources. The works themselves are not stored in YaMDb; you cannot watch a movie or listen to music here. The works are divided into categories such as "Books", "Films", "Music". For example, in the category "Books" there may be works "Winnie the Pooh and All-All-All" and "The Martian Chronicles", and in the category "Music" - the song "Yesterday" by the group "Beetles" and the second suite of Bach. The list of categories can be expanded (for example, you can add the category "Fine Arts" or "Jewellery"). A work can optionally be assigned a genre from the list of preset ones (for example, "Fairy Tale", "Rock" or "Arthouse"). Only the administrator can add works, categories and genres. Grateful or indignant users leave text reviews for the works and rate the work in the range from one to ten (an integer); from user ratings, an average rating of the work is formed - rating (integer). A user can leave only one review per work. Other users can leave comments on previously posted reviews. 
+Only authenticated users can add reviews, comments and rate.
+
+Проект YaMDb создан для размещения отзывов пользователей на произведения, размещенных на любых других ресурсах. Сами произведения в YaMDb не хранятся, здесь нельзя посмотреть фильм или послушать музыку.
 Произведения делятся на категории, такие как «Книги», «Фильмы», «Музыка». Например, в категории «Книги» могут быть произведения «Винни-Пух и все-все-все» и «Марсианские хроники», а в категории «Музыка» — песня «Давеча» группы «Жуки» и вторая сюита Баха. Список категорий может быть расширен (например, можно добавить категорию «Изобразительное искусство» или «Ювелирка»).
 Произведению опционально может быть присвоен жанр из списка предустановленных (например, «Сказка», «Рок» или «Артхаус»).
 Добавлять произведения, категории и жанры может только администратор.
